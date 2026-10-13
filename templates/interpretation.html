@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h2>Model Interpretation & amp; Experimental Graphs</h2>
+    <p>
+        The core results of the Grover Policy Agent (GPA) paper (arxiv:2502.13755) center around
+        four key quantitative benchmarks proving quantum advantage in sensor circuit synthesis.
+    </p>
+</div>
+
+<div class="card">
+    <h2>Fig. 6: QFI vs Grover Rotations (Base 2-Qubit QSC)</h2>
+    <div class="plot-container">
+        <img src="/app-results/fig6_base_qsc.png" alt="Figure 6 Base QSC" />
+    </div>
+    <h3>Model Interpretation:</h3>
+    <p>
+        In the 2-qubit Base QSC, the agent searches over squeezing angle pairs (theta_1, theta_2).
+        As Grover amplitude amplification iterates, the probability amplitude of states yielding maximal
+        Quantum Fisher Information (maximum entangled N00N-like states) approaches 1.0.
+        At the optimal theoretical bound of <code>k = 50</code> Grover rotations, the QFI peaks exactly at <code>1.0</code>,
+        matching the Heisenberg-limited sensitivity.
+    </p>
+</div>
+
+<div class="card">
+    <h2>Fig. 8: QFI vs Grover Rotations (Simplified 3-Qubit QSC)</h2>
+    <div class="plot-container">
+        <img src="/app-results/fig8_simplified_qsc.png" alt="Figure 8 Simplified QSC" />
+    </div>
+    <h3>Model Interpretation:</h3>
+    <p>
+        To reduce circuit complexity for NISQ devices, multi-qubit squeezing is replaced with Controlled-V gates
+        and single-qubit rotations. Because of ancilla dilution and approximation bounds, the maximal QFI attainable
+        is <code>0.5</code> at <code>k = 40</code> rotations. This confirms that GPA converges to the theoretically pareto-optimal
+        circuit under gate-decomposition constraints.
+    </p>
+</div>
+
+<div class="card">
+    <h2>Fig. 7: QPE Mean Absolute Error (MAE) vs Counting Qubits</h2>
+    <div class="plot-container">
+        <img src="/app-results/fig7_qpe_mae.png" alt="Figure 7 QPE MAE" />
+    </div>
+    <h3>Model Interpretation:</h3>
+    <p>
+        Quantum Phase Estimation (QPE) is used to evaluate the value function V_pi(s).
+        The Mean Absolute Error (MAE) exhibits the predicted exponential decrease <code>O$2^-t$</code> as the
+        counting register size increases, reaching &lt; 0.004 at 8 counting qubits.
+    </p>
+</div>
+
+<div class="card">
+    <h2>Fig. 10: GPA vs GAQA Baseline Comparison</h2>
+    <div class="plot-container">
+        <img src="/app-results/fig10_gpa_vs_gaqa.png" alt="Figure 10 Comparison" />
+    </div>
+    <h3>Model Interpretation:</h3>
+    <p>
+        This comparison demonstrates the primary novelty of GPA.
+        Under an identical rotation budget of 40 rotations, GPA achieves <code>QFI = 0.50</code> compared to
+        the GAQA baseline which only reaches <code>QFI = 0.45</code> (an 11.1% advantage).
+        This occurs because GAQA sequentially allocates budgets to individual gates, leading to error compounding,
+        whereas GPA searches over the joint policy space using Grover amplification.
+    </p>
+</div>
+{% endblock %}

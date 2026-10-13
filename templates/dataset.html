@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h2>Quantum Simulation Datasets (per Paper 161)</h2>
+    <p>
+        As required by the research methodology, all datasets are generated directly from the quantum simulator statevector evaluations
+        of the sensor circuits, rather than using static external files.
+        Below are the generated datasets representing the actual experimental results.
+    </p>
+</div>
+
+<div class="card">
+    <h2>Base QSC QFI vs Grover Rotations (Data Sample)</h2>
+    <p>File: <code>dataset/base_qsc_rotations.csv</code> (Total rows: {{ base_data|length }})</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Grover Rotations (k)</th>
+                <th>Quantum Fisher Information (QFI)</th>
+                <th>Grover Success Probability</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in base_data[:8] %}
+            <tr>
+                <td>{{ row.grover_rotations }}</td>
+                <td>{{ row.qfi }}</td>
+                <td>{{ row.p_success }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h2>GPA vs GAQA Baseline Comparison (Data Sample)</h2>
+    <p>File: <code>dataset/gpa_vs_gaQa_comparison.csv</code></p>
+    <table>
+        <thead>
+            <tr>
+                <th>Rotations / Budget</th>
+                <th>GPA QFI (Joint Amplification)</th>
+                <th>GAQA RFI (Sequential Gate Search)</th>
+            </tr>
+        </thead>
+        <tbody>
+             {% for row in comp_data[:8] %}
+            <tr>
+                <td>{{ row.rotations }}</td>
+                <td>{{ row.gpa_qfi }}</td>
+                <td>{{ row.gaqa_qfi }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+ {% endblock %}

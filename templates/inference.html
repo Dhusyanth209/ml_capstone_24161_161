@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h2>Inference Pipeline &amp; Simulation Execution</h2>
+    <p>
+        The <code>inference.py</code> module executes the end-to-end quantum simulation pipeline without hardcoded values.
+        It simulates the quantum state evolution, evaluates Quantum Fisher Information (QFI), performs value estimation
+        via Quantum Phase Estimation (QPE), applies Grover Policy Iteration (QPI) across rotation sweeps, and exports clean
+        CSV datasets and high-resolution comparison plots.
+    </p>
+    <br />
+    <form action="/run-simulation" method="POST">
+        <button type="submit" class="btn">Re-run Quantum Simulation Pipeline</button>
+    </form>
+    {% if message %}
+        <p style="margin-top: 1rem; color: #16a34a; font-weight: 600;">{{ message }}</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Pipeline Execution Breakdown (Paper Methodology)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Phase</th>
+                <th>Circuit Architecture</th>
+                <th>Mathematical Operation</th>
+                <th>Output Produced</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>1. Base QSC Simulation</strong></td>
+                <td>2 Qubits (Base Squeezed Sensor)</td>
+                <td>Grover amplitude amplification over 64x64 grid</td>
+                <td><code>dataset/base_qsc_rotations.csv</code> &amp; <code>results/fig6_base_qsc.png</code></td>
+            </tr>
+            <tr>
+                <td><strong>2. Simplified QSC Simulation</strong></td>
+                <td>3 Qubits (2 Sensing + 1 Ancilla)</td>
+                <td>Approximate squeezing with Controlled-V & amp; V_dagger</td>
+                <td><code>dataset/simplified_qsc_rotations.csv</code> &amp; <code>results/fig8_simplified_qsc.png</code></td>
+            </tr>
+            <tr>
+                <td><strong>3. QPE Value Function Sweep</strong></td>
+                <td>t Counting Qubits + Sensing Register</td>
+                <td>Inverse QFT phase estimation (delta = 1/2^t)</td>
+                <td><code>dataset/qpe_mae_curve.csv</code> &amp; <code>results/fig7_qpe_mae.png</code></td>
+            </tr>
+            <tr>
+                <td><strong>4. GPA vs GAQA Benchmark</strong></td>
+                <td>3-Qubit Simplified Circuit (i=40 rotations)</td>
+                <td>Joint multi-parameter Grover vs Sequential gate search</td>
+                <td><code>dataset/gpa_vs_gaqa_comparison.csv</code> &amp; <code>results/fig10_gpa_vs_gaqa.png</code></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h2>Command-Line Execution Reference</h2>
+    <p>You can execute the exact same pipeline directly via the command line or integrate it into existing automated workflows:</p>
+    <pre><code># Run full end-to-end pipeline:
+python inference.py
+
+# Or run via modular CLI subcommands:
+python run_experiment.py --base-qsc
+python run_experiment.py --simplified-qsc
+python run_experiment.py --compare</code></pre>
+</div>
+{% endblock %}

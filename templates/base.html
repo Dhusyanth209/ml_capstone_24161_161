@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title if title else 'GPA Quantum Sensor Optimization' }}</title>
+    <link rel="stylesheet" href="/app-static/style.css">
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <div>
+            <div class="brand-title">GPA: Grover Policy Agent</div>
+            <div class="brand-subtitle">Quantum Sensor Circuit Optimization (arxiv:2502.13755)</div>
+        </div>
+        <nav>
+            <a href="/" class="{{ 'active' if active_tab == 'dashboard' }}">Dashboard</a>
+            <a href="/inference" class="{{ 'active' if active_tab == 'inference' }}">Inference</a>
+            <a href="/dataset" class="{{ 'active' if active_tab == 'dataset' }}">Datasets</a>
+            <a href="/interpretation" class="{{ 'active' if active_tab == 'interpretation' }}">Interpretation</a>
+            <a href="/novelty" class="{{ 'active' if active_tab == 'novelty' }}">Novelty & amp; PPT</a>
+        </nav>
+    </div>
+</header>
+<main>
+    {% block content %}{% endblock %}
+</main>
+<footer>
+    <p>Capstone Project: Faithful Implementation of Grover Policy Agent for Quantum Sensor Optimization (Paper 161)</p>
+</footer>
+</body>
+</html>

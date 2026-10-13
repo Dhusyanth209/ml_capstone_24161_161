@@ -1,0 +1,160 @@
+/* Minimal, robust, contentful styling for GPA Quantum Web UI */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f7f9fa;
+    color: #1a202c;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background-color: #1e3a8a;
+    color: #ffffff;
+    padding: 1rem 2rem;
+}
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.brand-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+.brand-subtitle {
+    font-size: 0.85rem;
+    color: #cbd5e1;
+}
+nav a {
+    color: #ffffff;
+    text-decoration: none;
+    margin-left: 1.25rem;
+    font-size: 0.95rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+nav a:hover, nav a.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    text-decoration: underline;
+}
+main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+.card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.card h2 {
+    color: #1e3a8a;
+    margin-bottom: 0.75rem;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.4rem;
+}
+.card h3 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    color: #2d3748;
+}
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+.stat-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 1.2rem;
+    border-radius: 6px;
+    text-align: center;
+}
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2563eb;
+}
+.stat-label {
+    font-size: 0.85rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.3rem;
+}
+.plot-container {
+    margin: 1.5rem 0;
+    text-align: center;
+}
+.plot-container img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: #ffffff;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+}
+th, td {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    text-align: left;
+}
+th {
+    background-color: #f1f5f9;
+    font-weight: 600;
+}
+tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+.btn {
+    display: inline-block;
+    background-color: #2563eb;
+    color: #ffffff;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+}
+.btn:hover {
+    background-color: #1d4ed8;
+}
+pre, code {
+    font-family: Consolas, Monaco, monospace;
+    background-color: #f1f5f9;
+    border-radius: 4px;
+}
+code {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.9em;
+}
+pre {
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    margin: 1rem 0;
+}
+footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #64748b;
+    font-size: 0.85rem;
+    border-top: 1px solid #e2e8f0;
+    margin-top: 3rem;
+}

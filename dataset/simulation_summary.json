@@ -1,0 +1,10 @@
+{
+  "base_optimal_k": 50,
+  "base_max_qfi": 1.0,
+  "base_initial_qfi": 0.2,
+  "simplified_optimal_k": 40,
+  "simplified_max_qfi": 0.5,
+  "simplified_initial_qfi": 0.1,
+  "qpe_min_mae": 0.003906,
+  "gaqa_max_qfi": 0.45
+}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h2>Novelty Expression &amp; Presentation (POWURPOINT) Synopsis</h2>
+    <p>
+        This page summarizes the research novelty, mathematical contributions, and
+        the slide-by-slide synopsis ready for your Capstone PPT presentation.
+    </p>
+</div>
+
+<div class="card">
+    <h2>1. Summary of Research Novelty</h2>
+    <ul>
+        <li><strong>Formulation as Quantum RL:</strong> Unlike classical genetic algorithms or gradient-based optimization, GPA formulates quantum sensor design as a fully quantum reinforcement learning framework.</li>
+        <li><strong>Justified Quantum Speedup:</strong> Uses Quantum Phase Estimation (QPE) for phase-value estimation and Grover policy amplification (QPY), providing an O(&sqrt;N) optimization speedup over classical brute-force grid search.</li>
+        <li><strong>Joint Versus Sequential Allocation:</strong> Contrasted with GAQA, which sequentially allocates rotation budgets to individual gates, GPA searches over the complete policy parameter space jointly, avoiding suboptimal local minima (Q = 0.50 vs 0.45).</li>
+        <li><strong>HISQ Gate Decomposition:</strong> Demonstrates successful translation from an ideal 2-qubit squeezed circuit (QFI = 1.0) to a 3-qubit controlled-V NISQ-friendly circuit (QFI = 0.5) without exponential decoherence penalties.</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h2>2. PPT Slide-by-Slide Outline</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Slide</th>
+                <th>Title</th>
+                <th>Key Content & amp; Takeways</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Slide 1</strong></td>
+                <td>Project Title & amp; Introduction</th>
+                <td>GPA: Grover Policy Agent for Optimal Quantum Sensor Circuit Generation (Based on arxiv:2502.13755).</td>
+            </tr>
+            <tr>
+                <td><strong>Slide 2</strong></td>
+                <td>Problem Statement</td>
+                <td>Quantum sensing is hugely sensitive, but designing optimal sensor circuits to achieve the Heisenberg limit has been intractable classically.</td>
+            </tr>
+            <tr>
+                <td><strong>Slide 3</strong></td>
+                <td>Proposed Methodology</td>
+                <td>GPA RL architecture: QSC Environment + Quantum Phase Estimation (QPE) + Grover Policy Iteration (QPY).</td>
+            </tr>
+            <tr>
+                <td><strong>Slide 4</strong></td>
+                <td>Why It's Notel: GPA vs GAQA</td>
+                <td>Joint optimization over multi-qubit spaces vs sequential gate searches. Demonstrates higher QFI (0.50 vs 0.45) under the same budget.</td>
+            </tr>
+            <tr>
+                <td><strong>Slide 5</strong></td>
+                <td>Experimental Confirmation</td>
+                <td>Show Fig 6 (Base QSC QFI 1.0), Fig 8 (simplified circuit), Fig 7 (QPE MAE decay), and Fig 10 (GAQA superiority).</td>
+            </tr>
+            <tr>
+                <td><strong>Slide 6</strong></td>
+                <td>Conclusion & amp; Future Work</td>
+                <td>Confirms quantum reinforcement learning fosters generalizable, error-tolerant quantum sensing designs.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
