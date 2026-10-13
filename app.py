@@ -4,6 +4,8 @@ import csv
 import json
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from inference import run_full_pipeline
+from src.gpa.rl_tracer import get_rl_pipeline_steps
+from src.gpa.qpi import grover_qfi_trajectory
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
@@ -47,6 +49,37 @@ def custom_results(filename):
 def dashboard():
     summary = load_summary()
     return render_template('dashboard.html', summary=summary, active_tab='dashboard')
+
+@app.route('/rl-visualization')
+def rl_visualization():
+    selected_circuit = request.args.get('circuit', 'base')
+    try:
+        k = int(request.args.get('rotations', 50 if selected_circuit == 'base' else 40))
+    except ValueError:
+        k = 50 if selected_circuit == 'base' else 40
+
+    if selected_circuit == 'base':
+        optimal_k = 50
+        qfi_init, qfi_target = 0.2, 1.0
+    else:
+        optimal_k = 40
+        qfi_init, qfi_target = 0.1, 0.5
+
+    qfi_curve, p_succ_curve = grover_qfi_trajectory([k], qfi_init, qfi_target, optimal_k)
+    current_qfi = round(qfi_curve[0], 4)
+    current_p_succ = round(p_succ_curve[0], 4)
+
+    steps = get_rl_pipeline_steps(selected_circuit, k)
+    return render_template(
+        'rl_visualization.html',
+        steps=steps,
+        selected_circuit=selected_circuit,
+        k=k,
+        current_qfi=current_qfi,
+        current_p_succ=current_p_succ,
+        optimal_k=optimal_k,
+        active_tab='rl_visualization'
+    )
 
 @app.route('/inference')
 def inference_page():
