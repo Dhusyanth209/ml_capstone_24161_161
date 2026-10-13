@@ -1,66 +1,74 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="card">
-    <h2>Quantum Reinforcement Learning (QRL) Rotation Tracer & Execution</h2>
+    <h2>Quantum Reinforcement Learning (QRL) Live Rotation Tracer</h2>
     <p>
-        Simulate and inspect every single Grover rotation step in the policy optimization loop.
-        For each rotation <code>k</code>, you can observe the exact <strong>Quantum Fisher Information (QFI)</strong>,
-        <strong>Reinforcement Reward R(k)</strong>, <strong>QPE Value Function V_&pi;(s)</strong>, and interpretative log outputs.
+        Observe the <strong>live graph plotting</strong> as each Grover rotation step <code>k</code> is simulated.
+        As the log moves through each rotation, the live graph plots Quantum Fisher Information (QFI),
+        RL Metrology Rewards <code>R(k)</code>, and QPE Value Functions <code>V_&pi;(s)</code> in real time.
     </p>
 </div>
 
 <div class="card">
     <h2>Simulation Control Panel</h2>
-    <form action="/rl-visualization" method="GET" style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+    <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
         <div>
             <label><strong>Select Sensor Circuit:</strong></label><br />
-            <select name="circuit" style="padding: 0.5rem 0.8rem; border-radius: 4px; border: 1px solid #cbd5e1; margin-top: 0.3rem;">
-                <option value="base" {{ 'selected' if selected_circuit == 'base' }}>Base 2-Qubit QSC (Squeezing, Target QFI = 1.0)</option>
-                <option value="simplified" {{ 'selected' if selected_circuit == 'simplified' }}>Simplified 3-Qubit QSC (NISQ Controlled-V, Target QFI = 0.5)</option>
+            <select id="sel-circuit" style="padding: 0.5rem 0.8rem; border-radius: 4px; border: 1px solid #cbd5e1; margin-top: 0.3rem;">
+                <option value="base" {{ 'selected' if selected_circuit == 'base' }}>Base 2-Qubit QSC (Squeezing, Target QFI attains 1.0)</option>
+                <option value="simplified" {{ 'selected' if selected_circuit == 'simplified' }}>Simplified 3-Qubit QSC (NISQ Controlled-V, Target QFI attains 0.5)</option>
             </select>
         </div>
 
         <div>
-            <label><strong>Number of Grover Rotations (k):</strong></label><br />
-            <input type="number" name="rotations" value="{{ k }}" min="1" max="60" style="padding: 0.5rem 0.8rem; border-radius: 4px; border: 1px solid #cbd5e1; width: 100px; margin-top: 0.3rem;" />
+            <label><strong>Grover Rotations (k):</strong></label><br />
+            <input type="number" id="inp-rotations" value="{{ k }}" min="1" max="60" style="padding: 0.5rem 0.8rem; border-radius: 4px; border: 1px solid #cbd5e1; width: 90px; margin-top: 0.3rem;" />
         </div>
 
         <div style="margin-top: 1.3rem;">
-            <button type="submit" class="btn">Execute RL Live Simulation</button>
+            <button type="button" id="btn-start" class="btn">Start Live Simulation</button>
+            <button type="button" id="btn-reset" class="btn" style="background: #e5e7eb; color: #1f2937; margin-left: 0.5rem;">Reset</button>
         </div>
-    </form>
+    </div>
 </div>
 
 <div class="stats-grid">
     <div class="stat-box">
-        <div class="stat-value">{{ k }}</div>
-        <div class="stat-label">Simulated Rotations</div>
+        <div class="stat-value" id="display-k">0</div>
+        <div class="stat-label">Current Rotation (k)</div>
     </div>
     <div class="stat-box">
-        <div class="stat-value">{{ latest_log.qfi }}</div>
-        <div class="stat-label">Final QFI at k={{ k }}</div>
+        <div class="stat-value" id="display-qfi">0.0000</div>
+        <div class="stat-label">Quantum Fisher Info (QFI)</div>
     </div>
     <div class="stat-box">
-        <div class="stat-value">{{ latest_log.reward }}</div>
+        <div class="stat-value" id="display-reward">0.0000</div>
         <div class="stat-label">RL Metrology Reward R</div>
     </div>
     <div class="stat-box">
-        <div class="stat-value">{{ latest_log.value_fn }}</div>
+        <div class="stat-value" id="display-value">0.0000</div>
         <div class="stat-label">QPE Value Function V_pi</div>
     </div>
 </div>
 
 <div class="card">
-    <h2>Dynamic Simulation Graph (k}=0  to k={{ k }})</h2>
-    <p>This graph is generated live for your selected rotation budget, displaying both QFI policy amplification and RL reward/value function evolution:</p>
-    <div class="plot-container" style="margin-top: 1.5rem;">
-        <img src="data:image/png;base64,{{ chart_b64 }}" alt="RL Rotation Simulation Graph" style="border: 1px solid #cbd5e1; border-radius: 6px;" />
+    <h2>Live Simulation Plotting Canvas</h2>
+    <p>This plot updates in real time as the Quancum RL/policy amplification loop executes each Grover rotation:</p>
+    <div style="margin-top: 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 300px; background: #ffffff; padding: 1rem; border: 1px solid #cbd5e1; border-radius: 6px;">
+            <h4 style="text-align: center; color: #1e3a8a; margin-bottom: 0.5rem;">QTI & Grover Success Probability</h4>
+            <canvas id="plot1_canvas" width="500" height="270" style="width: 100%; height: 270px;"></canvas>
+        </div>
+        <div style="flex: 1; min-width: 300px; background: #ffffff; padding: 1rem; border: 1px solid #cbd5e1; border-radius: 6px;">
+            <h4 style="text-align: center; color: #1e3a8a; margin-bottom: 0.5rem;">RL Metrology Reward & QPE Value Function</h4>
+            <canvas id="plot2_canvas" width="500" height="270" style="width: 100%; height: 270px;"></canvas>
+        </div>
     </div>
 </div>
 
 <div class="card">
-    <h2>Per-Rotation Quantum RL Execution & Interpretation Log</h2>
-    <p>Follow the exact progression of each rotation step from <code>k = 0</code> to <code>k = {{ k }}</code>:</p>
+    <h2>Live Rotation Simulation & Interpretation Log</h2>
+    <p>Each step appears downstream as the rotation is interrogated in real time:</p>
     <table style="margin-top: 1.5rem;">
         <thead>
             <tr>
@@ -72,18 +80,174 @@
                 <th>Interpretative Simulation Log</th>
             </tr>
         </thead>
-        <tbody>
-            {% for row in logs %}
-            <tr>
-                <td><strong>{{ row.rotation }}</strong></td>
-                <td><code>{{ row.qfi }}</code></td>
-                <td>{{ row.p_success }}</td>
-                <td><span style="color: #dc2626; font-weight: 600;">{{ row.reward }}</span></td>
-                <td><span style="color: #7c3aid; font-weight: 600;">{{ row.value_fn }}</span></td>
-                <td><small>{{ row.interpretation }}</small></td>
-            </tr>
-            {% endfor %}
+        <tbody id="logs-body">
+            <tr><td colspan="6" style="text-align: center; color: #64748b; padding: 2.5rem;">Click 'Start Live Simulation' above to execute the QRL policy amplification loop and view live plotting.</td></tr>
         </tbody>
     </table>
 </div>
+
+<script>
+(function() {
+    let animationId = null;
+    let currentLogs = [];
+    let stepIndex = 0;
+
+    const btnStart = document.getElementById('btn-start');
+    const btnReset = document.getElementById('btn-reset');
+    const selCircuit = document.getElementById('sel-circuit');
+    const inpRotations = document.getElementById('inp-rotations');
+    const logsBody = document.getElementById('logs-body');
+
+    const canvas1 = document.getElementById('plot1_canvas');
+    const canvas2 = document.getElementById('plot2_canvas');
+    const ctx1 = canvas1.getContext('2d');
+    const ctx2 = canvas2.getElementById('2d');
+
+    function clearCanvases() {
+        drawAxes(ctx1, canvas1, 'QFI & P(success)', 1.0);
+        drawAxes(ctx2, canvas2, 'REward & QPE Value', 10.0);
+    }
+
+    function drawAxes(ctx, cnv, ylabel, ymax) {
+        ctx.clearRect(0, 0, cnv.width, cnv.height);
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(0, 0, cnv.width, cnv.height);
+
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+
+        // Grid lines
+        for (let y = 30; y <= 220; y += 45) {
+            ctx.beginPath();
+            ctx.moveTo(50, y);
+            ctx.lineTo(cnv.width - 20, y);
+            ctx.stroke();
+        }
+
+        // Axes
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(50, 20);
+        ctx.lineTo(50, 220);
+        ctx.lineTo(cnv.width - 20, 220);
+        ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(ymax.toFixed(1), 42, 25);
+        ctx.fillText((0).toFixed(1), 42, 224);
+        ctx.textAlign = 'center';
+        ctx.fillText('0', 50, 240);
+        ctx.fillText(Int(inpRotations.value), cnv.width - 25, 240);
+        ctx.fillText('Grover Rotations (k)', cnv.width / 2, 255);
+    }
+
+    function plotSeries(ctx, cnv, data, ymax, color, isDashed) {
+        if (data.length === 0) return;
+        const maxK = Math.max(1, data.length - 1, Int(inpRotations.value));
+        const xScale = (cnv.width - 70) / maxK;
+        const yScale = 190 / ymax;
+
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        if (isDashed) ctx.setLineDash([4, 4]);
+        else ctx.setLineDash([]);
+
+        ctx.beginPath();
+        for (let i = 0; i < data.length; i++) {
+            const x = 50 + i *xScale;
+            const y = 220 - Math.min(data[i], ymax) *yScale;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Plot last point dot
+        const lastIndex = data.length - 1;
+        const lx = 50 + lastIndex *xScale;
+        const ly = 220 - Math.min(data[lastIndex], ymax) *yScale;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc((lx, ly, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function renderLivePlots(subset) {
+        drawAxes(ctx1, canvas1, 'QFI & P(success)', 1.0);
+        plotSeries(ctx1, canvas1, subset.map(d => d.qfi), 1.0, '#1d4ed8', false);
+        plotSeries(ctx1, canvas1, subset.map(d => d.p_success), 1.0, '#16a34a', true);
+
+        drawAxes(ctx2, canvas2, 'REward & QPE Value', 10.0);
+        plotSeries(ctx2, canvas2, subset.map(d => d.reward), 10.0, '#dc2626', false);
+        plotSeries(ctx2, canvas2, subset.map(d => d.value_fn), 1.0, "#7c3aid", true);
+    }
+
+    function startSimulation() {
+        if (animationId) clearInterval(animationId);
+
+        const circuit = selCircuit.value;
+        const rotations = inpRotations.value;
+
+        fetch(`/api/simulation-data?circuit=${circuit}&rotations=${rotations}`)
+            .then(res => res.json())
+            .then(data => {
+                currentLogs = data.logs;
+                stepIndex = 0;
+                logsBody.innerHTML = '';
+
+                animationId = setInterval(() => {
+                    if (stepIndex >= currentLogs.length) {
+                        clearInterval(animationId);
+                        return;
+                    }
+
+                    const step = currentLogs[stepIndex];
+
+                    // Update Top Stats
+                    document.getElementById('display-k').textContent = step.rotation;
+                    document.getElementById('display-qfi').textContent = step.qfi.toFixed(4);
+                    document.getElementById('display-reward').textContent = step.reward.toFixed(4);
+                    document.getElementById('display-value').textContent = step.value_fn.toFixed(4);
+
+                    // Append Row to Table
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td><strong>${step.rotation}</strong></td>
+                                <td><code>${step.qfi}</code></td>
+                                <td>${step.p_success}</td>
+                                <td><span style="color: #dc2626; font-weight: 600;">${step.reward}</span></td>
+                                <td><span style="color: #7c3aid; font-weight: 600;">${step.value_fn}</span></td>
+                                <td><small>${step.interpretation}</small></td>`;
+                    logsBody.appendChild(tr);
+
+                    // Live Plot up to current step
+                    renderLivePlots(currentLogs.slice(0, stepIndex + 1));
+
+                    stepIndex++;
+                }, 300); // 300ms per rotation step
+            });
+    }
+
+    function resetSimulation() {
+        if (animationId) clearInterval(animationId);
+        logsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 2.5rem;">Click 'Start Live Simulation' above to execute the QRL policy amplification loop and view live plotting.</td></tr>';
+        document.getElementById('display-k').textContent = 0;
+        document.getElementById('display-qfi').textContent = '0.0000';
+        document.getElementById('display-reward').textContent = '0.0000';
+        document.getElementById('display-value').textContent = '0.0000';
+        clearCanvases();
+    }
+
+    btnStart.addEventListener('click', startSimulation);
+    btnReset.addEventListener('click', resetSimulation);
+
+    // Initial empty plots
+    clearCanvases();
+    // Auto-start on page load
+    startSimulation();
+})();
+</script>
 {% endblock %}

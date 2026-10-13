@@ -1,7 +1,7 @@
 # Flask Application for GPA Quantum Sensor Circuit Prototype
 import os
 import json
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
 from inference import run_full_pipeline
 from src.gpa.rl_tracer import compute_rotation_logs
 
@@ -38,6 +38,22 @@ def dashboard():
     summary = load_summary()
     return render_template('dashboard.html', summary=summary, active_tab='dashboard')
 
+@app.route('/api/simulation-data')
+def api_simulation_data():
+    circuit = request.args.get('circuit', 'base')
+    try:
+        k = int(request.args.get('rotations', 10))
+    except ValueError:
+        k = 10
+    k = max(1, min(k, 60))
+    logs, _, optimal_k = compute_rotation_logs(circuit, k)
+    return jsonify({
+        'circuit': circuit,
+        'rotations': k,
+        'optimal_k': optimal_k,
+        'logs': logs
+    })
+
 @app.route('/rl-visualization')
 def rl_visualization():
     selected_circuit = request.args.get('circuit', 'base')
@@ -46,9 +62,7 @@ def rl_visualization():
     except ValueError:
         k = 10
 
-    # Ensure k is bounded nicely
     k = max(1, min(k, 60))
-
     logs, chart_b64, optimal_k = compute_rotation_logs(selected_circuit, k)
     latest_log = logs[-1]
 
