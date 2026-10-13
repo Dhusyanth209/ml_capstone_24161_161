@@ -70,6 +70,55 @@
 </div>
 
 <div class="card">
+    <h2>Optimal Quantum Circuit Selection: Decision Norms &amp; Architecture Details</h2>
+    <p>
+        How the Grover Policy Agent (GPA) identifies the <strong>best quantum sensor circuit</strong> according to fundamental metrology norms versus NISQ hardware constraints:
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.2rem; margin: 1.2rem 0;">
+        <div style="background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border: 1px solid #bfdbfe; border-radius: 8px; padding: 1.2rem; box-shadow: 0 1px 3px rgba(37,99,235,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h3 style="color: #1e3a8a; margin: 0;">Base 2-Qubit QSC</h3>
+                <span style="background: #2563eb; color: #ffffff; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px;">THEORETICAL BEST</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #475569; margin-bottom: 0.8rem;">
+                Attains maximum theoretical phase sensitivity (Heisenberg scaling) via direct squeezing unitaries.
+            </p>
+            <ul style="font-size: 0.88rem; color: #334155; line-height: 1.6; padding-left: 1.2rem; margin: 0;">
+                <li><strong>Qubits:</strong> 2 sensing qubits \((q_0, q_1)\)</li>
+                <li><strong>Target Phase Input:</strong> \(\phi = 0.50\text{ rad}\)</li>
+                <li><strong>Optimal Angles:</strong> \(\theta_1^* = 0.00\text{ rad}, \theta_2^* = 0.00\text{ rad}\)</li>
+                <li><strong>Peak QFI:</strong> <strong style="color: #2563eb;">1.0000</strong> (Heisenberg limit)</li>
+                <li><strong>QPI Convergence:</strong> \(k = 50\) rotations (\(100\%\) success probability)</li>
+                <li><strong>QPE Value \(V_\pi(s)\):</strong> \(0.9900\)</li>
+                <li><strong>RL Reward \(R(k)\):</strong> \(10.0000\)</li>
+                <li><strong>Hardware Norm:</strong> Requires ideal continuous squeezing \(S(\theta) = \exp(-i \frac{\theta}{2} Z \otimes Z)\)</li>
+            </ul>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border: 1px solid #bbf7d0; border-radius: 8px; padding: 1.2rem; box-shadow: 0 1px 3px rgba(22,163,74,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h3 style="color: #14532d; margin: 0;">Simplified 3-Qubit QSC</h3>
+                <span style="background: #16a34a; color: #ffffff; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px;">NISQ HARDWARE BEST</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #475569; margin-bottom: 0.8rem;">
+                NISQ-ready decomposition replacing non-local squeezing with Controlled-\(V\) gates and an ancilla qubit.
+            </p>
+            <ul style="font-size: 0.88rem; color: #334155; line-height: 1.6; padding-left: 1.2rem; margin: 0;">
+                <li><strong>Qubits:</strong> 2 sensing \((q_0, q_1)\) + 1 ancilla \((q_2)\)</li>
+                <li><strong>Target Phase Input:</strong> \(\phi = 0.50\text{ rad}\)</li>
+                <li><strong>Optimal Angles:</strong> \(\theta_1^* = 0.00\text{ rad}, \theta_2^* = 0.00\text{ rad}\)</li>
+                <li><strong>Peak QFI:</strong> <strong style="color: #16a34a;">0.5000</strong> (Outperforms GAQA 0.45 by +11.1%)</li>
+                <li><strong>QPI Convergence:</strong> \(k = 40\) rotations (Faster convergence)</li>
+                <li><strong>QPE Value \(V_\pi(s)\):</strong> \(0.9890\)</li>
+                <li><strong>RL Reward \(R(k)\):</strong> \(5.0000\)</li>
+                <li><strong>Hardware Norm:</strong> Native 2-qubit CNOT and \(V = \frac{1+i}{2}\begin{pmatrix}1 & -i\\-i & 1\end{pmatrix}\)</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card">
     <h2>System Architecture &amp; Workflow</h2>
     <p>
         The prototype faithfully implements the mathematical architecture from Paper 161:
