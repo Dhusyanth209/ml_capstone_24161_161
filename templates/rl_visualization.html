@@ -38,7 +38,7 @@
         <div class="stat-label">Current Rotation (k)</div>
     </div>
     <div class="stat-box">
-        <div class="stat-value"0id="display-qfi">0.0000</div>
+        <div class="stat-value" id="display-qfi">0.0000</div>
         <div class="stat-label">Quantum Fisher Info (QFI)</div>
     </div>
     <div class="stat-box">
@@ -46,7 +46,7 @@
         <div class="stat-label">RL Metrology Reward R</div>
     </div>
     <div class="stat-box">
-        <div class="stat-value"0id="display-value">0.0000</div>
+        <div class="stat-value" id="display-value">0.0000</div>
         <div class="stat-label">QPE Value Function V_pi</div>
     </div>
 </div>
@@ -208,10 +208,15 @@
 
                     const step = currentLogs[stepIndex];
 
-                    document.getElementById('display-k').textContent = step.rotation;
-                    document.getElementById('display-qfi').textContent = step.qfi.toFixed(4);
-                    document.getElementById('display-reward').textContent = step.reward.toFixed(4);
-                    document.getElementById('display-value').textContent = step.value_fn.toFixed(4);
+                    const elK = document.getElementById('display-k');
+                    const elQfi = document.getElementById('display-qfi');
+                    const elReward = document.getElementById('display-reward');
+                    const elValue = document.getElementById('display-value');
+
+                    if (elK) elK.textContent = step.rotation;
+                    if (elQfi) elQfi.textContent = step.qfi.toFixed(4);
+                    if (elReward) elReward.textContent = step.reward.toFixed(4);
+                    if (elValue) elValue.textContent = step.value_fn.toFixed(4);
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = '<td><strong>' + step.rotation + '</strong></td>' +
@@ -235,15 +240,19 @@
     function resetSimulation() {
         if (animationId) clearInterval(animationId);
         logsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 2.5rem;">Click Start Live Simulation above to execute the QRL policy amplification loop and view live plotting.</td></tr>';
-        document.getElementById('display-k').textContent = 0;
-        document.getElementById('display-qfi').textContent = '0.0000';
-        document.getElementById('display-reward').textContent = '0.0000';
-        document.getElementById('display-value').textContent = '0.0000';
+        const elK = document.getElementById('display-k');
+        const elQfi = document.getElementById('display-qfi');
+        const elReward = document.getElementById('display-reward');
+        const elValue = document.getElementById('display-value');
+        if (elK) elK.textContent = 0;
+        if (elQfi) elQfi.textContent = '0.0000';
+        if (elReward) elReward.textContent = '0.0000';
+        if (elValue) elValue.textContent = '0.0000';
         clearCanvases();
     }
 
-    btnStart.addEventListener('click', startSimulation);
-    btnReset.addEventListener('click', resetSimulation);
+    if (btnStart) btnStart.addEventListener('click', startSimulation);
+    if (btnReset) btnReset.addEventListener('click', resetSimulation);
 
     clearCanvases();
     startSimulation();
