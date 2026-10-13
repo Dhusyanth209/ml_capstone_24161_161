@@ -81,7 +81,7 @@
             </tr>
         </thead>
         <tbody id="logs-body">
-            <tr><td colspan="6" style="text-align: center; color: #64748b; padding: 2.5rem;">Click 'Start Live Simulation' above to execute the QRL policy amplification loop and view live plotting.</td></tr>
+            <tr><td colspan="6" style="text-align: center; color: #64748b; padding: 2.5rem;">Click Start Live Simulation above to execute the QRL policy amplification loop and view live plotting.</td></tr>
         </tbody>
     </table>
 </div>
@@ -100,15 +100,17 @@
 
     const canvas1 = document.getElementById('plot1_canvas');
     const canvas2 = document.getElementById('plot2_canvas');
-    const ctx1 = canvas1.getContext('2d');
-    const ctx2 = canvas2.getElementById('2d');
+    const ctx1 = canvas1 ? canvas1.getContext('2d') : null;
+    const ctx2 = canvas2 ? canvas2.getContext('2d') : null;
 
     function clearCanvases() {
+        if (!ctx1 || !ctx2) return;
         drawAxes(ctx1, canvas1, 'QFI & P(success)', 1.0);
         drawAxes(ctx2, canvas2, 'Reward & QPE Value', 10.0);
     }
 
     function drawAxes(ctx, cnv, ylabel, ymax) {
+        if (!ctx || !cnv) return;
         ctx.clearRect(0, 0, cnv.width, cnv.height);
         ctx.fillStyle = '#f8fafc';
         ctx.fillRect(0, 0, cnv.width, cnv.height);
@@ -140,14 +142,14 @@
         ctx.fillText((0).toFixed(1), 42, 224);
         ctx.textAlign = 'center';
         ctx.fillText('0', 50, 240);
-        const targetK = parseInt(inpRotations.value, 10) || 10;
+        const targetK = inpRotations ? (parseInt(inpRotations.value, 10) || 10) : 10;
         ctx.fillText(targetK, cnv.width - 25, 240);
         ctx.fillText('Grover Rotations (k)', cnv.width / 2, 255);
     }
 
     function plotSeries(ctx, cnv, data, ymax, color, isDashed) {
-        if (data.length === 0) return;
-        const targetK = parseInt(inpRotations.value, 10) || 10;
+        if (!ctx || !cnv || !data || data.length === 0) return;
+        const targetK = inpRotations ? (parseInt(inpRotations.value, 10) || 10) : 10;
         const maxK = Math.max(1, data.length - 1, targetK);
         const xScale = (cnv.width - 70) / maxK;
         const yScale = 190 / ymax;
@@ -160,16 +162,16 @@
 
         ctx.beginPath();
         for (let i = 0; i < data.length; i++) {
-            const x = 50 + i *xScale;
-            const y = 220 - Math.min(data[i], ymax) *yScale;
+            const x = 50 + i * xScale;
+            const y = 220 - Math.min(data[i], ymax) * yScale;
             if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
         }
         ctx.stroke();
 
         const lastIndex = data.length - 1;
-        const lx = 50 + lastIndex *xScale;
-        const ly = 220 - Math.min(data[lastIndex], ymax) *yScale;
+        const lx = 50 + lastIndex * xScale;
+        const ly = 220 - Math.min(data[lastIndex], ymax) * yScale;
         ctx.fillStyle = color;
         ctx.beginPath();
         ctx.arc(lx, ly, 4, 0, Math.PI * 2);
@@ -178,27 +180,28 @@
     }
 
     function renderLivePlots(subset) {
+        if (!ctx1 || !ctx2) return;
         drawAxes(ctx1, canvas1, 'QFI & P(success)', 1.0);
         plotSeries(ctx1, canvas1, subset.map(d => d.qfi), 1.0, '#1d4ed8', false);
         plotSeries(ctx1, canvas1, subset.map(d => d.p_success), 1.0, '#16a34a', true);
 
         drawAxes(ctx2, canvas2, 'Reward & QPE Value', 10.0);
         plotSeries(ctx2, canvas2, subset.map(d => d.reward), 10.0, '#dc2626', false);
-        plotSeries(ctx2, canvas2, subset.map(d => d.value_fn), 1.0, '#7c3aid', true);
+        plotSeries(ctx2, canvas2, subset.map(d => d.value_fn), 1.0, '#7c3aed', true);
     }
 
     function startSimulation() {
         if (animationId) clearInterval(animationId);
 
-        const circuit = selCircuit.value;
-        const rotations = parseInt(inpRotations.value, 10) || 10;
+        const circuit = selCircuit ? selCircuit.value : 'base';
+        const rotations = inpRotations ? (parseInt(inpRotations.value, 10) || 10) : 10;
 
         fetch('/api/simulation-data?circuit=' + encodeURIComponent(circuit) + '&rotations=' + encodeURIComponent(rotations))
             .then(res => res.json())
             .then(data => {
-                currentLogs = data.logs;
+                currentLogs = data.logs || [];
                 stepIndex = 0;
-                logsBody.innerHTML = '';
+                if (logsBody) logsBody.innerHTML = '';
 
                 animationId = setInterval(() => {
                     if (stepIndex >= currentLogs.length) {
@@ -218,17 +221,18 @@
                     if (elReward) elReward.textContent = step.reward.toFixed(4);
                     if (elValue) elValue.textContent = step.value_fn.toFixed(4);
 
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = '<td><strong>' + step.rotation + '</strong></td>' +
-                                '<td><code>' + step.qfi + '</code></td>' +
-                                '<td>' + step.p_success + '</td>' +
-                                '<td><span style="color: #dc2626; font-weight: 600;">' + step.reward + '</span></td>' +
-                                '<td><span style="color: #7c3aid; font-weight: 600;">' + step.value_fn + '</span></td>' +
-                                '<td><small>' + step.interpretation + '</small></td>';
-                    logsBody.appendChild(tr);
+                    if (logsBody) {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = '<td><strong>' + step.rotation + '</strong></td>' +
+                                     '<td><code>' + step.qfi.toFixed(4) + '</code></td>' +
+                                     '<td>' + step.p_success.toFixed(4) + '</td>' +
+                                     '<td><span style="color: #dc2626; font-weight: 600;">' + step.reward.toFixed(4) + '</span></td>' +
+                                     '<td><span style="color: #7c3aed; font-weight: 600;">' + step.value_fn.toFixed(4) + '</span></td>' +
+                                     '<td><small>' + step.interpretation + '</small></td>';
+                        logsBody.appendChild(tr);
+                    }
 
                     renderLivePlots(currentLogs.slice(0, stepIndex + 1));
-
                     stepIndex++;
                 }, 250);
             })
@@ -239,12 +243,14 @@
 
     function resetSimulation() {
         if (animationId) clearInterval(animationId);
-        logsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 2.5rem;">Click Start Live Simulation above to execute the QRL policy amplification loop and view live plotting.</td></tr>';
+        if (logsBody) {
+            logsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 2.5rem;">Click Start Live Simulation above to execute the QRL policy amplification loop and view live plotting.</td></tr>';
+        }
         const elK = document.getElementById('display-k');
         const elQfi = document.getElementById('display-qfi');
         const elReward = document.getElementById('display-reward');
         const elValue = document.getElementById('display-value');
-        if (elK) elK.textContent = 0;
+        if (elK) elK.textContent = '0';
         if (elQfi) elQfi.textContent = '0.0000';
         if (elReward) elReward.textContent = '0.0000';
         if (elValue) elValue.textContent = '0.0000';
