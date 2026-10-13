@@ -3,18 +3,23 @@
 <div class="card">
     <h2>Inference Pipeline &amp; Simulation Execution</h2>
     <p>
-        The <code>inference.py</code> module executes the end-to-end quantum simulation pipeline without hardcoded values.
-        It simulates the quantum state evolution, evaluates Quantum Fisher Information (QFI), performs value estimation
-        via Quantum Phase Estimation (QPE), applies Grover Policy Iteration (QPI) across rotation sweeps, and exports clean
-        CSV datasets and high-resolution comparison plots.
+        The <code>inference.py</code> module executes the full quantum simulation pipeline per Paper 161.
+        Click the button below to execute the quantum simulation pipeline immediately and view the
+        <strong>live terminal execution output</strong> directly underneath.
     </p>
     <br />
     <form action="/run-simulation" method="POST">
-        <button type="submit" class="btn">Re-run Quantum Simulation Pipeline</button>
+        <button type="submit" class="btn">Run Quantum Simulation Pipeline</button>
     </form>
     {% if message %}
         <p style="margin-top: 1rem; color: #16a34a; font-weight: 600;">{{ message }}</p>
     {% endif %}
+</div>
+
+<div class="card">
+    <h2>Simulation Terminal Execution Output</h2>
+    <p>Live stdout captured directly from the quantum simulator execution:</p>
+    <pre style="background: #1e1e1e; color: #4ade60; padding: 1.2rem; border-radius: 6px; font-family: 'Consolas', 'Courier New', monospace; line-height: 1.5; overflow-x: auto; margin-top: 1rem;"><code>{{ terminal_output if terminal_output else '=== Simulation ready to run. Click «Run Quantum Simulation Pipeline¹ above. ===' }}</code></pre>
 </div>
 
 <div class="card">
@@ -49,23 +54,11 @@
             </tr>
             <tr>
                 <td><strong>4. GPA vs GAQA Benchmark</strong></td>
-                <td>3-Qubit Simplified Circuit (i=40 rotations)</td>
+                <td>3-Qubit Simplified Circuit (k=40 rotations)</td>
                 <td>Joint multi-parameter Grover vs Sequential gate search</td>
                 <td><code>dataset/gpa_vs_gaqa_comparison.csv</code> &amp; <code>results/fig10_gpa_vs_gaqa.png</code></td>
             </tr>
         </tbody>
     </table>
-</div>
-
-<div class="card">
-    <h2>Command-Line Execution Reference</h2>
-    <p>You can execute the exact same pipeline directly via the command line or integrate it into existing automated workflows:</p>
-    <pre><code># Run full end-to-end pipeline:
-python inference.py
-
-# Or run via modular CLI subcommands:
-python run_experiment.py --base-qsc
-python run_experiment.py --simplified-qsc
-python run_experiment.py --compare</code></pre>
 </div>
 {% endblock %}

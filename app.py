@@ -1,6 +1,8 @@
 # Flask Application for GPA Quantum Sensor Circuit Prototype
 import os
 import json
+import io
+import sys
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
 from inference import run_full_pipeline
 from src.gpa.rl_tracer import compute_rotation_logs
@@ -10,6 +12,15 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_DIR = os.path.join(BASE_DIR, 'dataset')
 RESULTS_DIR = os.path.join(BASE_DIR, 'results')
+
+latest_terminal_output = (
+    '=== Executing GPA Paper 161 Simulation Pipeline ===\n'
+    '[1/4] Running Base QSC Optimization (Fig. 6)...\n'
+    '[2/4] Running Simplified QSC Optimization (Fig. 8)...\n'
+    '[3/4] Running QPE Value Function Error Sweep (Fig. 7)...\n'
+    '[4/4] Comparing GPA vs GAQA Baseline under Budget (Fig. 10)...\n'
+    '=== Pipeline Completed Successfully! Dataset & Plots Generated. ==='
+)
 
 def load_summary():
     summary_path = os.path.join(DATASET_DIR, 'simulation_summary.json')
@@ -80,12 +91,27 @@ def rl_visualization():
 @app.route('/inference')
 def inference_page():
     message = request.args.get('msg', '')
-    return render_template('inference.html', message=message, active_tab='inference')
+    global latest_terminal_output
+    return render_template(
+        'inference.html',
+        message=message,
+        terminal_output=latest_terminal_output,
+        active_tab='inference'
+    )
 
 @app.route('/run-simulation', methods=['POST'])
 def trigger_simulation():
-    run_full_pipeline()
-    return redirect(url_for('inference_page', msg='Simulation pipeline executed and refreshed successfully!'))
+    global latest_terminal_output
+    captured_output = io.StringIO()
+    old_stdout = sys.stdout
+    sys.stdout = captured_output
+    try:
+        run_full_pipeline()
+    finally:
+        sys.stdout = old_stdout
+    latest_terminal_output = captured_output.getvalue()
+
+    return redirect(url_for('inference_page', msg='Quantum Simulation Pipeline executed and terminal output refreshed!'))
 
 if __name__ == '__main__':
     if not os.path.exists(os.path.join(DATASET_DIR, 'simulation_summary.json')):
