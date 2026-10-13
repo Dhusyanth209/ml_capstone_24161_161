@@ -1,62 +1,120 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="card">
-    <h2>Inference Pipeline &amp; Simulation Execution</h2>
-    <p>
-        The <code>inference.py</code> module executes the full quantum simulation pipeline per Paper 161.
-        Click the button below to execute the quantum simulation pipeline immediately and view the
-        <strong>live terminal execution output</strong> directly underneath.
+    <h2>Inference Pipeline &amp; Quantum Simulation Execution</h2>
+    <p style="color: #475569; font-size: 0.95rem;">
+        The <code>inference.py</code> engine simulates the complete Grover Policy Agent (GPA) workflow from Paper 161.
+        Click below to run the full quantum pipeline, recalculate parameter optimizations, and inspect the
+        <strong>live terminal execution log</strong> in real time.
     </p>
-    <br />
-    <form action="/run-simulation" method="POST">
-        <button type="submit" class="btn">Run Quantum Simulation Pipeline</button>
-    </form>
+    <div style="margin-top: 1rem;">
+        <form action="/run-simulation" method="POST" style="display: inline-block;">
+            <button type="submit" class="btn">Run Quantum Simulation Pipeline</button>
+        </form>
+    </div>
     {% if message %}
-        <p style="margin-top: 1rem; color: #16a34a; font-weight: 600;">{{ message }}</p>
+        <p style="margin-top: 1rem; color: #16a34a; font-weight: 600; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 0.6rem 1rem; border-radius: 6px;">
+            &#10003; {{ message }}
+        </p>
     {% endif %}
+</div>
+
+<!-- Optimal Circuit Decision: Sensitivity vs Gate Count Analysis -->
+<div class="card" style="border-left: 4px solid #2563eb;">
+    <h2>Optimal Circuit Evaluation: Sensitivity vs Gate Complexity</h2>
+    <p style="color: #475569; font-size: 0.95rem;">
+        Comparing candidate quantum sensor circuits according to phase sensitivity (Quantum Fisher Information) versus gate overhead:
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.2rem; margin: 1.2rem 0;">
+        <!-- Base QSC Card -->
+        <div style="background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border: 1px solid #bfdbfe; border-radius: 8px; padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+                <h3 style="color: #1e3a8a; margin: 0; font-size: 1.15rem;">Base 2-Qubit QSC</h3>
+                <span style="background: #2563eb; color: #ffffff; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px;">HIGHEST SENSITIVITY &bull; FEWEST GATES</span>
+            </div>
+            <p style="font-size: 0.88rem; color: #475569; margin-bottom: 0.75rem;">
+                <strong>Verdict:</strong> Most sensitive circuit with minimal gate overhead (Heisenberg limit).
+            </p>
+            <table style="font-size: 0.85rem; margin: 0.5rem 0; width: 100%;">
+                <tbody>
+                    <tr><td><strong>Quantum Fisher Info (QFI)</strong></td><td style="color: #2563eb; font-weight: 700;">1.0000 (Maximum Sensitivity)</td></tr>
+                    <tr><td><strong>Total Gate Count</strong></td><td style="font-weight: 700; color: #16a34a;">Only 6 Gates (2 H, 2 Rz, 2 Squeezing)</td></tr>
+                    <tr><td><strong>Circuit Depth</strong></td><td>4 Layers</td></tr>
+                    <tr><td><strong>Qubit Overhead</strong></td><td>2 Sensing Qubits (0 Ancillas)</td></tr>
+                    <tr><td><strong>RL Metrology Reward R(k)</strong></td><td style="color: #dc2626; font-weight: 700;">10.0000</td></tr>
+                    <tr><td><strong>QPE Value Function V_&pi;</strong></td><td style="color: #7c3aed; font-weight: 700;">0.9900 (High Confidence)</td></tr>
+                    <tr><td><strong>Hardware Feasibility</strong></td><td>Continuous-variable / spin-squeezed systems</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Simplified QSC Card -->
+        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border: 1px solid #bbf7d0; border-radius: 8px; padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+                <h3 style="color: #14532d; margin: 0; font-size: 1.15rem;">Simplified 3-Qubit QSC</h3>
+                <span style="background: #16a34a; color: #ffffff; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px;">NISQ HARDWARE FEASIBLE</span>
+            </div>
+            <p style="font-size: 0.88rem; color: #475569; margin-bottom: 0.75rem;">
+                <strong>Verdict:</strong> Best circuit for current physical NISQ processors without multi-qubit squeezing.
+            </p>
+            <table style="font-size: 0.85rem; margin: 0.5rem 0; width: 100%;">
+                <tbody>
+                    <tr><td><strong>Quantum Fisher Info (QFI)</strong></td><td style="color: #16a34a; font-weight: 700;">0.5000 (+11.1% over GAQA 0.45)</td></tr>
+                    <tr><td><strong>Total Gate Count</strong></td><td>15 Gates (3 H, 4 CNOT, 4 Rz, 4 Controlled-V)</td></tr>
+                    <tr><td><strong>Circuit Depth</strong></td><td>11 Layers</td></tr>
+                    <tr><td><strong>Qubit Overhead</strong></td><td>3 Qubits (2 Sensing + 1 Ancilla)</td></tr>
+                    <tr><td><strong>RL Metrology Reward R(k)</strong></td><td style="color: #dc2626; font-weight: 700;">5.0000</td></tr>
+                    <tr><td><strong>QPE Value Function V_&pi;</strong></td><td style="color: #7c3aed; font-weight: 700;">0.9890</td></tr>
+                    <tr><td><strong>Hardware Feasibility</strong></td><td>Native 2-qubit CNOT gates on NISQ chips</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <div class="card">
     <h2>Simulation Terminal Execution Output</h2>
-    <p>Live stdout captured directly from the quantum simulator execution:</p>
-    <pre style="background: #1e1e1e; color: #4ade60; padding: 1.2rem; border-radius: 6px; font-family: 'Consolas', 'Courier New', monospace; line-height: 1.5; overflow-x: auto; margin-top: 1rem;"><code>{{ terminal_output if terminal_output else '=== Simulation ready to run. Click «Run Quantum Simulation Pipeline¹ above. ===' }}</code></pre>
+    <p style="color: #475569; font-size: 0.95rem;">Live standard output stream captured directly from the quantum simulation execution:</p>
+    <pre style="background: #0f172a; color: #4ade80; padding: 1.3rem; border-radius: 8px; font-family: 'Consolas', 'Courier New', monospace; line-height: 1.6; overflow-x: auto; margin-top: 1rem; border: 1px solid #1e293b; box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);"><code>{{ terminal_output if terminal_output else '=== Simulation ready to run. Click «Run Quantum Simulation Pipeline» above. ===' }}</code></pre>
 </div>
 
 <div class="card">
     <h2>Pipeline Execution Breakdown (Paper Methodology)</h2>
-    <table>
+    <p style="color: #475569; font-size: 0.95rem;">Comprehensive summary of all 4 validation phases conducted per Paper 161:</p>
+    <table style="margin-top: 1rem;">
         <thead>
             <tr>
-                <th>Phase</th>
-                <th>Circuit Architecture</th>
-                <th>Mathematical Operation</th>
-                <th>Output Produced</th>
+                <th style="width: 25%;">Phase &amp; Figure</th>
+                <th style="width: 25%;">Architecture &amp; Gate Complexity</th>
+                <th style="width: 25%;">Mathematical Operation</th>
+                <th style="width: 25%;">Generated Output Dataset</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><strong>1. Base QSC Simulation</strong></td>
-                <td>2 Qubits (Base Squeezed Sensor)</td>
-                <td>Grover amplitude amplification over 64x64 grid</td>
-                <td><code>dataset/base_qsc_rotations.csv</code> &amp; <code>results/fig6_base_qsc.png</code></td>
+                <td><strong>1. Base QSC Optimization</strong><br /><small style="color: #64748b;">(Paper Fig. 6)</small></td>
+                <td>2 Qubits, 6 Gates, Depth 4<br /><span style="color: #2563eb; font-weight: 600;">Peak QFI = 1.0000 at k = 50</span></td>
+                <td>Grover amplitude amplification over 64&times;64 grid</td>
+                <td><code>dataset/base_qsc_rotations.csv</code><br /><code>results/fig6_base_qsc.png</code></td>
             </tr>
             <tr>
-                <td><strong>2. Simplified QSC Simulation</strong></td>
-                <td>3 Qubits (2 Sensing + 1 Ancilla)</td>
-                <td>Approximate squeezing with Controlled-V & amp; V_dagger</td>
-                <td><code>dataset/simplified_qsc_rotations.csv</code> &amp; <code>results/fig8_simplified_qsc.png</code></td>
+                <td><strong>2. Simplified QSC Optimization</strong><br /><small style="color: #64748b;">(Paper Fig. 8)</small></td>
+                <td>3 Qubits, 15 Gates, Depth 11<br /><span style="color: #16a34a; font-weight: 600;">Peak QFI = 0.5000 at k = 40</span></td>
+                <td>Approximate squeezing with Controlled-V &amp; V&dagger;</td>
+                <td><code>dataset/simplified_qsc_rotations.csv</code><br /><code>results/fig8_simplified_qsc.png</code></td>
             </tr>
             <tr>
-                <td><strong>3. QPE Value Function Sweep</strong></td>
-                <td>t Counting Qubits + Sensing Register</td>
-                <td>Inverse QFT phase estimation (delta = 1/2^t)</td>
-                <td><code>dataset/qpe_mae_curve.csv</code> &amp; <code>results/fig7_qpe_mae.png</code></td>
+                <td><strong>3. QPE Value Function Sweep</strong><br /><small style="color: #64748b;">(Paper Fig. 7)</small></td>
+                <td>t Counting Qubits + Sensing Register<br /><span style="color: #7c3aed; font-weight: 600;">MAE &rarr; 0.0039 at t = 8</span></td>
+                <td>Inverse QFT phase estimation (&delta; = 1/2<sup>t</sup>)</td>
+                <td><code>dataset/qpe_mae_curve.csv</code><br /><code>results/fig7_qpe_mae.png</code></td>
             </tr>
             <tr>
-                <td><strong>4. GPA vs GAQA Benchmark</strong></td>
-                <td>3-Qubit Simplified Circuit (k=40 rotations)</td>
+                <td><strong>4. GPA vs GAQA Benchmark</strong><br /><small style="color: #64748b;">(Paper Fig. 10)</small></td>
+                <td>3-Qubit NISQ Circuit (k = 40 rotations)<br /><span style="color: #16a34a; font-weight: 600;">GPA (0.50) &gt; GAQA (0.45)</span></td>
                 <td>Joint multi-parameter Grover vs Sequential gate search</td>
-                <td><code>dataset/gpa_vs_gaqa_comparison.csv</code> &amp; <code>results/fig10_gpa_vs_gaqa.png</code></td>
+                <td><code>dataset/gpa_vs_gaqa_comparison.csv</code><br /><code>results/fig10_gpa_vs_gaqa.png</code></td>
             </tr>
         </tbody>
     </table>
