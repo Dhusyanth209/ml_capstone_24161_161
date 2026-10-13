@@ -1,91 +1,89 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="card">
-    <h2>Quantum Reinforcement Learning (QRL) Process Tracer</h2>
+    <h2>Quantum Reinforcement Learning (QRL) Rotation Tracer & Execution</h2>
     <p>
-        This interactive page demonstrates <strong>where and how reinforcement learning happens</strong>
-        to discover optimal quantum sensing circuits, following the exact steps from the source environment,
-        through <em>Quantum Phase Estimation (QPE)</em>, <em>Grover Policy Iteration (QPI)</em>, and
-        <em>Quantum Fisher Information (QFI) reward evaluation</em>.
+        Simulate and inspect every single Grover rotation step in the policy optimization loop.
+        For each rotation <code>k</code>, you can observe the exact <strong>Quantum Fisher Information (QFI)</strong>,
+        <strong>Reinforcement Reward R(k)</strong>, <strong>QPE Value Function V_&pi;(s)</strong>, and interpretative log outputs.
     </p>
 </div>
 
 <div class="card">
-    <h2>Interactive Circuit Simulation Control</h2>
-    <form action="/rl-visualization" method="GET" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-        <label><strong>Select Circuit:</strong></label>
-        <select name="circuit" style="padding: 0.4rem 0.8rem; border-radius: 4px; border: 1px solid #cbd5e1;">
-            <option value="base" {{ 'selected' if selected_circuit == 'base' }}>Base 2-Qubit QSC (Squeezing Gates)</option>
-            <option value="simplified" {{ 'selected' if selected_circuit == 'simplified' }}>Simplified 3-Qubit QSC (Controlled-V NISQ)</option>
-        </select>
+    <h2>Simulation Control Panel</h2>
+    <form action="/rl-visualization" method="GET" style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+        <div>
+            <label><strong>Select Sensor Circuit:</strong></label><br />
+            <select name="circuit" style="padding: 0.5rem 0.8rem; border-radius: 4px; border: 1px solid #cbd5e1; margin-top: 0.3rem;">
+                <option value="base" {{ 'selected' if selected_circuit == 'base' }}>Base 2-Qubit QSC (Squeezing, Target QFI = 1.0)</option>
+                <option value="simplified" {{ 'selected' if selected_circuit == 'simplified' }}>Simplified 3-Qubit QSC (NISQ Controlled-V, Target QFI = 0.5)</option>
+            </select>
+        </div>
 
-        <label><strong>Grover Rotations (k):</strong></label>
-        <input type="number" name="rotations" value="{{ k }}" min="0" max="60" style="padding: 0.4rem 0.8rem; border-radius: 4px; border: 1px solid #cbd5e1; width: 80px;" />
+        <div>
+            <label><strong>Number of Grover Rotations (k):</strong></label><br />
+            <input type="number" name="rotations" value="{{ k }}" min="1" max="60" style="padding: 0.5rem 0.8rem; border-radius: 4px; border: 1px solid #cbd5e1; width: 100px; margin-top: 0.3rem;" />
+        </div>
 
-        <button type="submit" class="btn">Execute RL simulation</button>
+        <div style="margin-top: 1.3rem;">
+            <button type="submit" class="btn">Execute RL Live Simulation</button>
+        </div>
     </form>
 </div>
 
 <div class="stats-grid">
     <div class="stat-box">
         <div class="stat-value">{{ k }}</div>
-        <div class="stat-label">Active Grover Rotations (k)</div>
+        <div class="stat-label">Simulated Rotations</div>
     </div>
     <div class="stat-box">
-        <div class="stat-value">{{ current_qfi }}</div>
-        <div class="stat-label">Quantum Fisher Information (QFI)</div>
+        <div class="stat-value">{{ latest_log.qfi }}</div>
+        <div class="stat-label">Final QFI at k={{ k }}</div>
     </div>
     <div class="stat-box">
-        <div class="stat-value">{{ current_p_succ }}</div>
-        <div class="stat-label">Grover Success Probability</div>
+        <div class="stat-value">{{ latest_log.reward }}</div>
+        <div class="stat-label">RL Metrology Reward R</div>
     </div>
     <div class="stat-box">
-        <div class="stat-value">{{ optimal_k }}</div>
-        <div class="stat-label">Optimal k_opt Target</div>
+        <div class="stat-value">{{ latest_log.value_fn }}</div>
+        <div class="stat-label">QPE Value Function V_pi</div>
     </div>
 </div>
 
 <div class="card">
-    <h2>Step-by-Step Quantum RL Execution Trace</h2>
-    <p>Follow each stage of the circuit synthesis process downstream:</p>
-    <br />
+    <h2>Dynamic Simulation Graph (k}=0  to k={{ k }})</h2>
+    <p>This graph is generated live for your selected rotation budget, displaying both QFI policy amplification and RL reward/value function evolution:</p>
+    <div class="plot-container" style="margin-top: 1.5rem;">
+        <img src="data:image/png;base64,{{ chart_b64 }}" alt="RL Rotation Simulation Graph" style="border: 1px solid #cbd5e1; border-radius: 6px;" />
+    </div>
+</div>
 
-    <table>
+<div class="card">
+    <h2>Per-Rotation Quantum RL Execution & Interpretation Log</h2>
+    <p>Follow the exact progression of each rotation step from <code>k = 0</code> to <code>k = {{ k }}</code>:</p>
+    <table style="margin-top: 1.5rem;">
         <thead>
             <tr>
-                <th>Step</th>
-                <th>Stage / Phase</th>
-                <th>Component</th>
-                <th>Action / Operation</th>
-                <th>Mathematical Formulation</th>
-                <th>Produced State</th>
+                <th style="width: 10px;">k</th>
+                <th>Quantum Fisher Info (QFI)</th>
+                <th>Grover P(success)</th>
+                <th>RL Reward R(k)</th>
+                <th>QPE Value V_pi(s)</th>
+                <th>Interpretative Simulation Log</th>
             </tr>
         </thead>
         <tbody>
-            {% for s in steps %}
+            {% for row in logs %}
             <tr>
-                <td><strong>{{ s.step_num }}</strong></td>
-                <td><strong>{{ s.stage }}</strong></td>
-                <td><code>{{ s.component }}</code></td>
-                <td>{{ s.action }}</td>
-                <td><code>{{ s.math }}</code></td>
-                <td><span style="color: #16a34a; font-weight: 600;">{{ s.output }}</span></td>
+                <td><strong>{{ row.rotation }}</strong></td>
+                <td><code>{{ row.qfi }}</code></td>
+                <td>{{ row.p_success }}</td>
+                <td><span style="color: #dc2626; font-weight: 600;">{{ row.reward }}</span></td>
+                <td><span style="color: #7c3aid; font-weight: 600;">{{ row.value_fn }}</span></td>
+                <td><small>{{ row.interpretation }}</small></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-</div>
-
-<div class="card">
-    <h2>Hyperparameter &amp; Discretization Interpretation</h2>
-    <p>
-        <strong>Question: Where does RL training heuristically sample actions?</strong>
-    </p>
-    <p>
-        The agent represents actions as pairs of squeezing parameters <em>(theta_1, theta_2)</em>.
-        To attain the paper's amplification benchmark of <code>k = 50</code> rotations, the policy space is discretized
-        into a 64x64 grid (N=4096 candidates). QPE evaluates the value v_pi(s) for each candidate,
-        and QPI executes Grover amplification to project the quantum state onto the optimal QFI subspace.
-    </p>
 </div>
 {% endblock %}

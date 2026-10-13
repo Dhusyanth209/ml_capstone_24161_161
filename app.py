@@ -1,11 +1,9 @@
 # Flask Application for GPA Quantum Sensor Circuit Prototype
 import os
-import csv
 import json
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from inference import run_full_pipeline
-from src.gpa.rl_tracer import get_rl_pipeline_steps
-from src.gpa.qpi import grover_qfi_trajectory
+from src.gpa.rl_tracer import compute_rotation_logs
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
@@ -27,16 +25,6 @@ def load_summary():
         'qpe_min_mae': 0.003906
     }
 
-def read_csv(filename):
-    file_path = os.path.join(DATASET_DIR, filename)
-    rows = []
-    if os.path.exists(file_path):
-        with open(file_path, 'r', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            for r in reader:
-                rows.append(r)
-    return rows
-
 @app.route('/app-static/<path:filename>')
 def custom_static(filename):
     return send_from_directory(os.path.join(BASE_DIR, 'static'), filename)
@@ -54,29 +42,23 @@ def dashboard():
 def rl_visualization():
     selected_circuit = request.args.get('circuit', 'base')
     try:
-        k = int(request.args.get('rotations', 50 if selected_circuit == 'base' else 40))
+        k = int(request.args.get('rotations', 10))
     except ValueError:
-        k = 50 if selected_circuit == 'base' else 40
+        k = 10
 
-    if selected_circuit == 'base':
-        optimal_k = 50
-        qfi_init, qfi_target = 0.2, 1.0
-    else:
-        optimal_k = 40
-        qfi_init, qfi_target = 0.1, 0.5
+    # Ensure k is bounded nicely
+    k = max(1, min(k, 60))
 
-    qfi_curve, p_succ_curve = grover_qfi_trajectory([k], qfi_init, qfi_target, optimal_k)
-    current_qfi = round(qfi_curve[0], 4)
-    current_p_succ = round(p_succ_curve[0], 4)
+    logs, chart_b64, optimal_k = compute_rotation_logs(selected_circuit, k)
+    latest_log = logs[-1]
 
-    steps = get_rl_pipeline_steps(selected_circuit, k)
     return render_template(
         'rl_visualization.html',
-        steps=steps,
+        logs=logs,
+        latest_log=latest_log,
+        chart_b64=chart_b64,
         selected_circuit=selected_circuit,
         k=k,
-        current_qfi=current_qfi,
-        current_p_succ=current_p_succ,
         optimal_k=optimal_k,
         active_tab='rl_visualization'
     )
@@ -90,20 +72,6 @@ def inference_page():
 def trigger_simulation():
     run_full_pipeline()
     return redirect(url_for('inference_page', msg='Simulation pipeline executed and refreshed successfully!'))
-
-@app.route('/dataset')
-def dataset_page():
-    base_data = read_csv('base_qsc_rotations.csv')
-    comp_data = read_csv('gpa_vs_gaqa_comparison.csv')
-    return render_template('dataset.html', base_data=base_data, comp_data=comp_data, active_tab='dataset')
-
-@app.route('/interpretation')
-def interpretation_page():
-    return render_template('interpretation.html', active_tab='interpretation')
-
-@app.route('/novelty')
-def novelty_page():
-    return render_template('novelty.html', active_tab='novelty')
 
 if __name__ == '__main__':
     if not os.path.exists(os.path.join(DATASET_DIR, 'simulation_summary.json')):
